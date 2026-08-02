@@ -2,17 +2,40 @@ import { Star, Quote } from 'lucide-react'
 import { testimonials, brand } from '../data/content'
 import SectionHeading from './SectionHeading'
 import FadeIn from './FadeIn'
+import FloatingIcecream from './FloatingIcecream'
 
 /**
  * "Testimonials" — quote cards from hosts who booked the van.
  */
 export default function Testimonials() {
   return (
-    <section className="border-y border-gray-100 bg-white py-14 sm:py-20">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section className="relative border-y border-gray-100 bg-white py-14 sm:py-20">
+      <FloatingIcecream
+        src="/animation-image/images__1_-removebg-preview.png"
+        size={110}
+        mobileSize={42}
+        top={8}
+        left={16}
+        opacity={0.65}
+        parallax={60}
+        scrollRotate={12}
+        className="block"
+      />
+      <FloatingIcecream
+        src="/animation-image/3d-cartoon-colorful-ice-cream-character-waffle-cone_894067-21329-removebg-preview.png"
+        size={72}
+        mobileSize={40}
+        bottom={10}
+        right={20}
+        opacity={0.6}
+        parallax={50}
+        scrollRotate={10}
+        className="block"
+      />
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading
           eyebrow="Testimonials"
-          title="Hosts love the scoops"
+          title="Hosts love the 99s"
           subtitle="A 5.0 rating across hundreds of events — here’s what they say."
         />
 

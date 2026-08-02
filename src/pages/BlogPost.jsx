@@ -112,19 +112,19 @@ export default function BlogPost() {
           {others.length > 0 && (
             <div className="mt-14">
               <h3 className="text-xl font-extrabold text-gray-900">Keep reading</h3>
-              <div className="mt-6 grid gap-6 sm:grid-cols-2">
+              <div className="mt-6 grid items-start gap-6 sm:grid-cols-2">
                 {others.map((p) => (
                   <FadeIn key={p.id}>
                     <Link
                       to={`/blog/${p.slug}`}
-                      className="group flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-black/[0.03] transition-all duration-300 hover:-translate-y-1 hover:shadow-soft"
+                      className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-black/[0.03] transition-all duration-300 hover:-translate-y-1 hover:shadow-soft"
                     >
-                      <div className="h-40 overflow-hidden">
+                      <div className="overflow-hidden">
                         <img
                           src={p.image}
                           alt={p.alt || p.title}
                           loading="lazy"
-                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          className="w-full h-auto transition-transform duration-500 group-hover:scale-105"
                         />
                       </div>
                       <div className="flex flex-1 flex-col p-5">

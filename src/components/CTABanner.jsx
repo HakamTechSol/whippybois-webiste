@@ -2,11 +2,12 @@ import { CheckCircle2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { ctaImage } from '../data/content'
 import FadeIn from './FadeIn'
+import FloatingIcecream from './FloatingIcecream'
 
 const perks = [
-  'Weddings, birthdays, corporate events & more',
-  'Fresh flavors with free toppings',
-  'Fully insured, licensed and dependable',
+  'Weddings, birthdays, school fetes & festivals',
+  'Classic 99s, whippy cones & vegan lollies',
+  '5-star hygiene rated & fully insured',
 ]
 
 /**
@@ -26,6 +27,19 @@ export default function CTABanner() {
               className="absolute inset-0 h-full w-full object-cover opacity-40"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-gray-950 via-gray-900/85 to-brand-700/40" />
+
+            {/* Floating decorative cone in the empty right-hand corner */}
+            <FloatingIcecream
+              src="/animation-image/images__2_-removebg-preview.png"
+              size={180}
+              mobileSize={80}
+              bottom={28}
+              right={40}
+              opacity={0.95}
+              parallax={80}
+              scrollRotate={14}
+              className="block"
+            />
 
             <div className="relative grid items-center gap-8 p-8 sm:p-12 lg:grid-cols-2">
               <div>

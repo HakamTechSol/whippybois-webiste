@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 import FadeIn from './FadeIn'
+import FloatingIcecream from './FloatingIcecream'
 
 /**
  * Final CTA banner shown just before the footer.
@@ -13,6 +14,19 @@ export default function FinalCTA() {
           <div className="bg-brand-gradient relative overflow-hidden rounded-3xl px-8 py-14 text-center text-white shadow-soft sm:px-12 sm:py-16">
             <div className="pointer-events-none absolute -left-20 -top-24 h-72 w-72 rounded-full bg-white/10 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-28 -right-16 h-80 w-80 rounded-full bg-white/10 blur-3xl" />
+
+            {/* Floating decorative cone in a corner */}
+            <FloatingIcecream
+              src="/animation-image/images__1_-removebg-preview.png"
+              size={140}
+              mobileSize={76}
+              top={24}
+              right={40}
+              opacity={0.9}
+              parallax={90}
+              scrollRotate={16}
+              className="block"
+            />
 
             <h2 className="relative mx-auto max-w-2xl text-3xl font-extrabold leading-tight sm:text-4xl lg:text-5xl">
               Ready to sweeten your next event?

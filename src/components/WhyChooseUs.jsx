@@ -4,6 +4,7 @@ import { whyChooseUs } from '../data/content'
 import SectionHeading from './SectionHeading'
 import FadeIn from './FadeIn'
 import Icon from './Icon'
+import FloatingIcecream from './FloatingIcecream'
 
 const benefits = [
   'Transparent packages, no hidden fees',
@@ -17,8 +18,19 @@ const benefits = [
  */
 export default function WhyChooseUs() {
   return (
-    <section id="why-us" className="scroll-mt-20 bg-white py-14 sm:py-20">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section id="why-us" className="relative scroll-mt-20 bg-white py-14 sm:py-20">
+      <FloatingIcecream
+        src="/animation-image/images__1_-removebg-preview.png"
+        size={110}
+        mobileSize={40}
+        top={8}
+        right={20}
+        opacity={0.65}
+        parallax={60}
+        scrollRotate={12}
+        className="block"
+      />
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading
           eyebrow="Why choose us"
           title="Booking with total peace of mind"

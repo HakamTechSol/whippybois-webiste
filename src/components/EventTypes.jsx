@@ -3,14 +3,26 @@ import { ArrowUpRight } from 'lucide-react'
 import { eventTypes } from '../data/content'
 import SectionHeading from './SectionHeading'
 import FadeIn from './FadeIn'
+import FloatingIcecream from './FloatingIcecream'
 
 /**
  * "Perfect for every event" — grid of the kinds of celebrations we cater for.
  */
 export default function EventTypes() {
   return (
-    <section id="events" className="scroll-mt-20 bg-white py-14 sm:py-20">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section id="events" className="relative scroll-mt-20 bg-white py-14 sm:py-20">
+      <FloatingIcecream
+        src="/animation-image/3d-cartoon-colorful-ice-cream-character-waffle-cone_894067-21329-removebg-preview.png"
+        size={120}
+        mobileSize={44}
+        top={8}
+        left={16}
+        opacity={0.7}
+        parallax={70}
+        scrollRotate={12}
+        className="block"
+      />
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading
           eyebrow="Perfect for every event"
           title="One van, every celebration"
@@ -19,13 +31,13 @@ export default function EventTypes() {
 
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {eventTypes.map((item, i) => (
-            <FadeIn key={item.id} delay={i * 0.08}>
+            <FadeIn key={item.id} delay={i * 0.08} className="h-full">
               <motion.article
                 whileHover={{ y: -6 }}
                 transition={{ duration: 0.25 }}
-                className="group h-full overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-gray-100/80"
+                className="group flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-gray-100/80"
               >
-                <div className="relative h-44 overflow-hidden">
+                <div className="relative aspect-[4/3] overflow-hidden">
                   <img
                     src={item.image}
                     alt={item.alt || item.title}
@@ -37,7 +49,7 @@ export default function EventTypes() {
                     <ArrowUpRight size={16} />
                   </span>
                 </div>
-                <div className="p-5">
+                <div className="flex flex-1 flex-col p-5">
                   <h3 className="text-lg font-bold text-gray-900">{item.title}</h3>
                   <p className="mt-1 text-sm leading-relaxed text-gray-600">{item.blurb}</p>
                 </div>

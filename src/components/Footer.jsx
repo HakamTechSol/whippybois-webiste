@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Facebook, Instagram, Twitter, Linkedin, ShieldCheck, Lock, BadgeCheck } from 'lucide-react'
-import { brand, footerLinks } from '../data/content'
+import { brand, footerLinks, serviceAreas } from '../data/content'
+import FloatingIcecream from './FloatingIcecream'
 
 const socials = [
   { icon: Facebook, label: 'Facebook' },
@@ -20,8 +21,20 @@ const badges = [
  */
 export default function Footer() {
   return (
-    <footer className="border-t border-gray-100 bg-white">
-      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+    <footer className="relative overflow-hidden border-t border-gray-100 bg-white">
+      {/* Subtle floating decorative cone in a corner */}
+      <FloatingIcecream
+        src="/animation-image/images-removebg-preview.png"
+        size={100}
+        mobileSize={56}
+        bottom={20}
+        right={28}
+        opacity={0.6}
+        parallax={60}
+        scrollRotate={10}
+        className="block"
+      />
+      <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr_1fr]">
           {/* Brand blurb */}
           <div className="max-w-sm">
@@ -33,10 +46,24 @@ export default function Footer() {
               />
             </Link>
             <p className="mt-4 text-sm leading-relaxed text-gray-600">
-              {brand.name} is a fully-insured mobile ice cream van bringing fresh scoops, cones and
-              smiles to weddings, birthdays, corporate events and festivals across the Philadelphia
-              area.
+              {brand.name} is a trusted, fully insured soft-serve ice cream van hire company based in
+              Slough. Since {brand.since}, we’ve been serving classic 99s, whippy cones and vegan
+              lollies at weddings, parties, school fetes and festivals.
             </p>
+            {/* Coverage */}
+            <h4 className="mt-5 text-sm font-bold uppercase tracking-wider text-gray-900">
+              Where we serve
+            </h4>
+            <ul className="mt-3 flex flex-wrap gap-1.5">
+              {serviceAreas.map((area) => (
+                <li
+                  key={area}
+                  className="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-700"
+                >
+                  {area}
+                </li>
+              ))}
+            </ul>
             {/* Trust badges */}
             <div className="mt-5 flex flex-wrap gap-2">
               {badges.map((b) => (

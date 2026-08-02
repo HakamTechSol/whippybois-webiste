@@ -2,14 +2,37 @@ import { steps } from '../data/content'
 import SectionHeading from './SectionHeading'
 import FadeIn from './FadeIn'
 import Icon from './Icon'
+import FloatingIcecream from './FloatingIcecream'
 
 /**
  * "How it works" — three numbered steps with icon, title and description.
  */
 export default function HowItWorks() {
   return (
-    <section id="how-it-works" className="scroll-mt-20 bg-cream-100 py-14 sm:py-20">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section id="how-it-works" className="relative scroll-mt-20 bg-cream-100 py-14 sm:py-20">
+      <FloatingIcecream
+        src="/animation-image/images__2_-removebg-preview.png"
+        size={120}
+        mobileSize={44}
+        top={8}
+        right={20}
+        opacity={0.7}
+        parallax={70}
+        scrollRotate={12}
+        className="block"
+      />
+      <FloatingIcecream
+        src="/animation-image/3d-cartoon-colorful-ice-cream-character-waffle-cone_894067-21329-removebg-preview.png"
+        size={72}
+        mobileSize={44}
+        bottom={10}
+        left={16}
+        opacity={0.6}
+        parallax={50}
+        scrollRotate={10}
+        className="block"
+      />
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading
           eyebrow="How it works"
           title="Book your van in 3 simple steps"

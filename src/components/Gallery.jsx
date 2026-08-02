@@ -2,36 +2,48 @@ import { motion } from 'framer-motion'
 import { galleryImages } from '../data/content'
 import SectionHeading from './SectionHeading'
 import FadeIn from './FadeIn'
+import FloatingIcecream from './FloatingIcecream'
 
 /**
- * "Gallery" — responsive photo grid with captions.
+ * "Gallery" — masonry photo wall with captions.
+ * Images keep their natural aspect ratio (no cropping), so portrait
+ * photos like the "At your event next?" shot display full height.
  */
 export default function Gallery() {
   return (
-    <section id="gallery" className="scroll-mt-20 bg-white py-14 sm:py-20">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section id="gallery" className="relative scroll-mt-20 bg-white py-14 sm:py-20">
+      <FloatingIcecream
+        src="/animation-image/images-removebg-preview.png"
+        size={110}
+        mobileSize={44}
+        top={8}
+        left={16}
+        opacity={0.7}
+        parallax={60}
+        scrollRotate={10}
+        className="block"
+      />
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading
           eyebrow="Gallery"
           title="Life at the van"
           subtitle="Real events, real scoops, real smiles — a peek at what we bring to your celebration."
         />
 
-        <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-12 columns-1 gap-5 sm:columns-2 lg:columns-3">
           {galleryImages.map((item, i) => (
-            <FadeIn key={item.caption} delay={(i % 3) * 0.08}>
+            <FadeIn key={item.caption} delay={(i % 3) * 0.08} className="mb-5 break-inside-avoid">
               <motion.figure
                 whileHover={{ y: -4 }}
                 transition={{ duration: 0.25 }}
                 className="group relative overflow-hidden rounded-2xl shadow-card ring-1 ring-black/[0.03]"
               >
-                <div className="aspect-[4/3] overflow-hidden">
-                  <img
-                    src={item.image}
-                    alt={item.alt}
-                    loading="lazy"
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                </div>
+                <img
+                  src={item.image}
+                  alt={item.alt}
+                  loading="lazy"
+                  className="w-full h-auto transition-transform duration-500 group-hover:scale-105"
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent opacity-80" />
                 <figcaption className="absolute bottom-0 left-0 right-0 p-4">
                   <p className="text-sm font-bold text-white drop-shadow">{item.caption}</p>

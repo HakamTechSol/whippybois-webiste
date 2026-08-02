@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { brand, contactInfo } from '../data/content'
 import FadeIn from '../components/FadeIn'
+import FloatingIcecream from '../components/FloatingIcecream'
 
 const sections = [
   {
@@ -77,8 +78,19 @@ export default function PrivacyPolicy() {
   return (
     <>
       {/* Page header */}
-      <section className="bg-gradient-to-b from-lavender-100 via-cream-100 to-white pt-28 pb-10 sm:pt-36 sm:pb-14">
-        <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
+      <section className="relative bg-gradient-to-b from-lavender-100 via-cream-100 to-white pt-28 pb-10 sm:pt-36 sm:pb-14">
+        <FloatingIcecream
+          src="/animation-image/images__1_-removebg-preview.png"
+          size={72}
+          mobileSize={40}
+          top={76}
+          left={24}
+          opacity={0.5}
+          parallax={40}
+          scrollRotate={8}
+          className="block"
+        />
+        <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6">
           <FadeIn>
             <span className="inline-block rounded-full bg-brand-100 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-brand-700">
               Legal

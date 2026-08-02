@@ -86,7 +86,7 @@ export default function Navbar() {
         <div className="hidden items-center gap-3 md:flex">
           <Link
             to="/contact"
-            className="bg-brand-gradient rounded-full px-5 py-2.5 text-sm font-semibold text-white shadow-card transition-all hover:-translate-y-0.5 hover:shadow-soft"
+            className="bg-brand-gradient group inline-flex items-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-semibold text-white shadow-card transition-all hover:-translate-y-0.5 hover:shadow-soft"
           >
             Get a Quote
           </Link>
@@ -137,7 +137,7 @@ export default function Navbar() {
               <div className="pt-3">
                 <Link
                   to="/contact"
-                  className="bg-brand-gradient flex rounded-full px-4 py-2.5 text-center text-sm font-semibold text-white"
+                  className="bg-brand-gradient group flex items-center justify-center gap-1.5 rounded-full px-4 py-2.5 text-center text-sm font-semibold text-white"
                 >
                   Get a Quote
                 </Link>

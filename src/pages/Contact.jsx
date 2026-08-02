@@ -4,10 +4,11 @@ import { Mail, Phone, MapPin, Send, CheckCircle2, X, Clock, Loader2, AlertCircle
 import { contactInfo } from '../data/content'
 import { submitQuoteRequest } from '../lib/supabaseApi'
 import FadeIn from '../components/FadeIn'
+import FloatingIcecream from '../components/FloatingIcecream'
 
 const eventTypeOptions = ['Wedding', 'Corporate Event', 'Birthday', 'Charity Event', 'Other']
 
-const budgetOptions = ['Under $1000', '$1000-$5000', '$5000-$10000', '$10000+']
+const budgetOptions = ['Under £300', '£300-£600', '£600-£1000', '£1000+']
 
 const contactCards = [
   { icon: Mail, label: 'Email us', value: contactInfo.email, href: `mailto:${contactInfo.email}` },
@@ -34,6 +35,38 @@ const minDate = (() => {
   return d.toISOString().split('T')[0]
 })()
 
+// Lightweight celebrate burst shown after a successful submission (pure Framer Motion).
+const PARTICLES = ['🍨', '🍬', '🍭', '✨']
+const SprinkleBurst = () => {
+  const items = Array.from({ length: 18 }, (_, i) => {
+    const angle = (i / 18) * 360 + Math.random() * 25
+    const dist = 60 + Math.random() * 100
+    return {
+      id: i,
+      emoji: PARTICLES[i % PARTICLES.length],
+      dx: Math.cos((angle * Math.PI) / 180) * dist,
+      dy: Math.sin((angle * Math.PI) / 180) * dist,
+      rot: Math.random() * 120 - 60,
+      delay: Math.random() * 0.12,
+    }
+  })
+  return (
+    <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[70] flex items-center justify-center">
+      {items.map((p) => (
+        <motion.span
+          key={p.id}
+          className="absolute text-2xl"
+          initial={{ x: 0, y: 0, opacity: 1, scale: 0.5 }}
+          animate={{ x: p.dx, y: p.dy, opacity: 0, scale: 1.1, rotate: p.rot }}
+          transition={{ duration: 0.85, delay: p.delay, ease: 'easeOut' }}
+        >
+          {p.emoji}
+        </motion.span>
+      ))}
+    </div>
+  )
+}
+
 /**
  * Contact page — quote request form (left) + contact info & map placeholder (right).
  * Form is controlled with client-side validation; on submit it POSTs a public
@@ -44,6 +77,7 @@ export default function Contact() {
   const [errors, setErrors] = useState({})
   const [toast, setToast] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [celebrate, setCelebrate] = useState(false)
 
   // Auto-dismiss the toast after a few seconds.
   useEffect(() => {
@@ -104,6 +138,8 @@ export default function Contact() {
         message: form.message.trim() || null,
       }
       await submitQuoteRequest(payload)
+      setCelebrate(true)
+      window.setTimeout(() => setCelebrate(false), 1000)
       setToast({
         type: 'success',
         title: 'Quote request sent!',
@@ -137,8 +173,19 @@ export default function Contact() {
   return (
     <>
       {/* Page header */}
-      <section className="bg-gradient-to-b from-lavender-100 via-cream-100 to-white pt-28 pb-10 sm:pt-36 sm:pb-14">
-        <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+      <section className="relative bg-gradient-to-b from-lavender-100 via-cream-100 to-white pt-28 pb-10 sm:pt-36 sm:pb-14">
+        <FloatingIcecream
+          src="/animation-image/images__2_-removebg-preview.png"
+          size={120}
+          mobileSize={44}
+          top={76}
+          right={24}
+          opacity={0.8}
+          parallax={70}
+          scrollRotate={12}
+          className="block"
+        />
+        <div className="relative mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
           <FadeIn>
             <span className="inline-block rounded-full bg-brand-100 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-brand-700">
               Contact us
@@ -154,8 +201,30 @@ export default function Contact() {
         </div>
       </section>
 
-      <section className="bg-white pb-16 sm:pb-24">
-        <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[1.5fr_1fr] lg:gap-12 lg:px-8">
+      <section className="relative bg-white pb-16 sm:pb-24">
+        <FloatingIcecream
+          src="/animation-image/images__1_-removebg-preview.png"
+          size={72}
+          mobileSize={44}
+          bottom={16}
+          left={16}
+          opacity={0.65}
+          parallax={50}
+          scrollRotate={12}
+          className="block"
+        />
+        <FloatingIcecream
+          src="/animation-image/3d-cartoon-colorful-ice-cream-character-waffle-cone_894067-21329-removebg-preview.png"
+          size={72}
+          mobileSize={40}
+          bottom={16}
+          right={16}
+          opacity={0.6}
+          parallax={50}
+          scrollRotate={10}
+          className="block"
+        />
+        <div className="relative mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[1.5fr_1fr] lg:gap-12 lg:px-8">
           {/* ===== Form ===== */}
           <FadeIn>
             <form
@@ -442,6 +511,9 @@ export default function Contact() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Celebrate burst on success */}
+      {celebrate && <SprinkleBurst />}
     </>
   )
 }
