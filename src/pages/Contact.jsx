@@ -21,6 +21,25 @@ const durationOptions = [
   "3+ hours (we'll confirm details)",
 ]
 
+// Map the human-readable form options to the database columns.
+const durationToMinutes = {
+  '30 minutes': 30,
+  '45 minutes': 45,
+  '1 hour': 60,
+  '1.5 hours': 90,
+  '2 hours': 120,
+  '2.5 hours': 150,
+  '3 hours': 180,
+  "3+ hours (we'll confirm details)": 180,
+}
+
+const budgetToRange = {
+  'Under £300': { budget_min: 0, budget_max: 300 },
+  '£300-£600': { budget_min: 300, budget_max: 600 },
+  '£600-£1000': { budget_min: 600, budget_max: 1000 },
+  '£1000+': { budget_min: 1000, budget_max: null },
+}
+
 const contactCards = [
   { icon: Mail, label: 'Email us', value: contactInfo.email, href: `mailto:${contactInfo.email}` },
   { icon: Phone, label: 'Call us', value: contactInfo.phone, href: `tel:${contactInfo.phone.replace(/\s/g, '')}` },
@@ -49,18 +68,20 @@ const minDate = (() => {
 })()
 
 // Lightweight celebrate burst shown after a successful submission (pure Framer Motion).
+// Particles are staggered by their distance so the burst radiates outward smoothly
+// instead of popping all at once.
 const PARTICLES = ['🍨', '🍬', '🍭', '✨']
 const SprinkleBurst = () => {
-  const items = Array.from({ length: 18 }, (_, i) => {
-    const angle = (i / 18) * 360 + Math.random() * 25
-    const dist = 60 + Math.random() * 100
+  const items = Array.from({ length: 24 }, (_, i) => {
+    const angle = (i / 24) * 360 + Math.random() * 15
+    const dist = 70 + Math.random() * 120
     return {
       id: i,
       emoji: PARTICLES[i % PARTICLES.length],
       dx: Math.cos((angle * Math.PI) / 180) * dist,
       dy: Math.sin((angle * Math.PI) / 180) * dist,
-      rot: Math.random() * 120 - 60,
-      delay: Math.random() * 0.12,
+      rot: Math.random() * 180 - 90,
+      delay: 0.05 + Math.random() * 0.3,
     }
   })
   return (
@@ -69,9 +90,9 @@ const SprinkleBurst = () => {
         <motion.span
           key={p.id}
           className="absolute text-2xl"
-          initial={{ x: 0, y: 0, opacity: 1, scale: 0.5 }}
-          animate={{ x: p.dx, y: p.dy, opacity: 0, scale: 1.1, rotate: p.rot }}
-          transition={{ duration: 0.85, delay: p.delay, ease: 'easeOut' }}
+          initial={{ x: 0, y: 0, opacity: 1, scale: 0.4 }}
+          animate={{ x: p.dx, y: p.dy, opacity: 0, scale: 1.15, rotate: p.rot }}
+          transition={{ duration: 1.1, delay: p.delay, ease: 'easeOut' }}
         >
           {p.emoji}
         </motion.span>
@@ -141,27 +162,34 @@ export default function Contact() {
 
     setLoading(true)
     try {
+      const budget = budgetToRange[form.budget_range] ?? { budget_min: 0, budget_max: null }
       const payload = {
-        full_name: form.full_name.trim(),
+        customer_name: form.full_name.trim(),
         email: form.email.trim(),
         phone: form.phone.trim() || null,
         event_type: form.event_type,
         event_date: form.event_date,
         event_time: form.event_time,
-        duration: form.duration,
+        duration_minutes: durationToMinutes[form.duration] ?? null,
         guest_count: form.guest_count ? Number(form.guest_count) : null,
         location: form.location.trim(),
-        budget_range: form.budget_range,
+        budget_min: budget.budget_min,
+        budget_max: budget.budget_max,
+        currency: 'GBP',
         message: form.message.trim() || null,
       }
       await submitQuoteRequest(payload)
       setCelebrate(true)
-      window.setTimeout(() => setCelebrate(false), 1000)
-      setToast({
-        type: 'success',
-        title: 'Quote request sent!',
-        body: 'We’ll be in touch within one business day.',
-      })
+      window.setTimeout(() => setCelebrate(false), 1800)
+      window.setTimeout(
+        () =>
+          setToast({
+            type: 'success',
+            title: 'Quote request sent!',
+            body: 'We’ll be in touch within one business day.',
+          }),
+        350,
+      )
       setForm(emptyForm)
     } catch (err) {
       // Keep the form data intact on failure so the user can retry.

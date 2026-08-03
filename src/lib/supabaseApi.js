@@ -6,8 +6,9 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
  * Public write-only insert into the `quote_requests` table.
  *
  * @param {object} payload - row matching the `quote_requests` columns
- *   (full_name, email, phone, event_type, event_date, event_time, duration,
- *    guest_count, location, budget_range, message)
+ *   (customer_name, email, phone, event_type, event_date, event_time,
+ *    duration_minutes, guest_count, location, budget_min, budget_max,
+ *    currency, message)
  * @returns {Promise<object[]>} the inserted row(s)
  */
 export async function submitQuoteRequest(payload) {
@@ -23,7 +24,6 @@ export async function submitQuoteRequest(payload) {
       'Content-Type': 'application/json',
       apikey: SUPABASE_ANON_KEY,
       Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-      Prefer: 'return=representation',
     },
     body: JSON.stringify(payload),
   })
@@ -33,5 +33,6 @@ export async function submitQuoteRequest(payload) {
     throw new Error(errorData?.message || 'Failed to submit request')
   }
 
-  return res.json()
+  // Anon insert returns 201 with no body (anon has no SELECT privilege).
+  return true
 }
