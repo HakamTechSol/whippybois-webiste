@@ -73,11 +73,6 @@ export const aboutImage = {
   alt: 'The WHIPPY BOIS van parked and ready for the day',
 }
 
-export const aboutExtraImage = {
-  src: local('img-8.jpg'),
-  alt: 'The WHIPPY BOIS van serving guests at an event',
-}
-
 // ---- Perfect for every event ----
 
 export const eventTypes = [
@@ -143,10 +138,10 @@ export const menu = {
     },
   ],
   flavours: [
-    { name: 'Strawberry', description: 'A classic fruity favourite.' },
-    { name: 'Chocolate', description: 'Rich, smooth and loved by all.' },
-    { name: 'Bubblegum', description: 'Fun, pink and full of flavour.' },
-    { name: 'Lemon', description: 'Zesty, fresh and refreshing.' },
+    { name: 'Strawberry', description: 'A classic fruity favourite.', color: 'bg-pink-500' },
+    { name: 'Chocolate', description: 'Rich, smooth and loved by all.', color: 'bg-[#6b3f1d]' },
+    { name: 'Bubblegum', description: 'Fun, bubblegum-blue and full of flavour.', color: 'bg-[#4FC3F7]' },
+    { name: 'Lemon', description: 'Zesty, fresh and refreshing.', color: 'bg-yellow-400' },
   ],
   lollies: {
     title: 'Vegan Ice Lollies',

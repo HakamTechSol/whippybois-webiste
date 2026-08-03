@@ -23,14 +23,6 @@ const coneTints = [
   { card: 'bg-cream-200', ring: 'ring-amber-100', icon: 'bg-gradient-to-br from-amber-400 to-orange-500' },
 ]
 
-// Flavor swatch dots matching each flavor.
-const flavorSwatches = {
-  Strawberry: 'bg-pink-500',
-  Chocolate: 'bg-[#6b3f1d]',
-  Bubblegum: 'bg-fuchsia-400',
-  Lemon: 'bg-yellow-400',
-}
-
 /**
  * "Menu & Flavors" — traditional soft whippy 99, cone types, flavours and vegan lollies.
  * Premium redesign: gradient-glow featured card, tinted cone cards, swatch flavour cards
@@ -178,7 +170,7 @@ export default function FlavorMenu() {
               className="flex h-full flex-col items-center justify-center gap-2.5 rounded-xl border border-gray-100 bg-white p-5 text-center shadow-card"
             >
               <span
-                className={`h-3.5 w-3.5 rounded-full ring-4 ring-white shadow-card ${flavorSwatches[f.name] ?? 'bg-brand-400'}`}
+                className={`h-3.5 w-3.5 rounded-full ring-4 ring-white shadow-card ${f.color ?? 'bg-brand-400'}`}
               />
               <h4 className="text-base font-extrabold text-gray-900">{f.name}</h4>
               <p className="text-xs leading-relaxed text-gray-500">{f.description}</p>

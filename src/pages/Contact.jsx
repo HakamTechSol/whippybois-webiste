@@ -10,6 +10,17 @@ const eventTypeOptions = ['Wedding', 'Corporate Event', 'Birthday', 'Charity Eve
 
 const budgetOptions = ['Under £300', '£300-£600', '£600-£1000', '£1000+']
 
+const durationOptions = [
+  '30 minutes',
+  '45 minutes',
+  '1 hour',
+  '1.5 hours',
+  '2 hours',
+  '2.5 hours',
+  '3 hours',
+  "3+ hours (we'll confirm details)",
+]
+
 const contactCards = [
   { icon: Mail, label: 'Email us', value: contactInfo.email, href: `mailto:${contactInfo.email}` },
   { icon: Phone, label: 'Call us', value: contactInfo.phone, href: `tel:${contactInfo.phone.replace(/\s/g, '')}` },
@@ -22,6 +33,8 @@ const emptyForm = {
   phone: '',
   event_type: '',
   event_date: '',
+  event_time: '',
+  duration: '',
   guest_count: '',
   location: '',
   budget_range: '',
@@ -110,6 +123,8 @@ export default function Contact() {
     } else if (form.event_date < minDate) {
       next.event_date = 'Please pick a future date.'
     }
+    if (!form.event_time) next.event_time = 'Please pick a time.'
+    if (!form.duration) next.duration = 'Pick a duration.'
     if (form.guest_count && (Number(form.guest_count) < 1 || Number.isNaN(Number(form.guest_count)))) {
       next.guest_count = 'Enter a valid guest count.'
     }
@@ -132,6 +147,8 @@ export default function Contact() {
         phone: form.phone.trim() || null,
         event_type: form.event_type,
         event_date: form.event_date,
+        event_time: form.event_time,
+        duration: form.duration,
         guest_count: form.guest_count ? Number(form.guest_count) : null,
         location: form.location.trim(),
         budget_range: form.budget_range,
@@ -328,6 +345,46 @@ export default function Contact() {
                     className={inputClass(errors.event_date)}
                   />
                   <FieldError msg={errors.event_date} />
+                </div>
+
+                {/* Event time */}
+                <div>
+                  <label htmlFor="event_time" className="mb-1.5 block text-sm font-semibold text-gray-800">
+                    Event time <span className="text-brand-600">*</span>
+                  </label>
+                  <input
+                    id="event_time"
+                    name="event_time"
+                    type="time"
+                    value={form.event_time}
+                    onChange={handleChange}
+                    className={inputClass(errors.event_time)}
+                  />
+                  <FieldError msg={errors.event_time} />
+                </div>
+
+                {/* Duration needed */}
+                <div>
+                  <label htmlFor="duration" className="mb-1.5 block text-sm font-semibold text-gray-800">
+                    Duration needed <span className="text-brand-600">*</span>
+                  </label>
+                  <select
+                    id="duration"
+                    name="duration"
+                    value={form.duration}
+                    onChange={handleChange}
+                    className={`${inputClass(errors.duration)} ${form.duration ? '' : 'text-gray-400'}`}
+                  >
+                    <option value="" disabled>
+                      How long do you need the van?
+                    </option>
+                    {durationOptions.map((d) => (
+                      <option key={d} value={d} className="text-gray-900">
+                        {d}
+                      </option>
+                    ))}
+                  </select>
+                  <FieldError msg={errors.duration} />
                 </div>
 
                 {/* Guest count */}

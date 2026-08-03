@@ -9,7 +9,7 @@ import {
   MapPin,
   ArrowRight,
 } from 'lucide-react'
-import { brand, aboutImage, aboutExtraImage, serviceAreas } from '../data/content'
+import { brand, aboutImage, serviceAreas } from '../data/content'
 import FadeIn from '../components/FadeIn'
 import FinalCTA from '../components/FinalCTA'
 import FloatingIcecream from '../components/FloatingIcecream'
@@ -103,20 +103,12 @@ export default function About() {
         <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
           <FadeIn>
             <div className="relative">
-              <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                <img
-                  src={aboutImage.src}
-                  alt={aboutImage.alt}
-                  loading="lazy"
-                  className="aspect-[4/5] w-full rounded-3xl object-cover shadow-soft ring-1 ring-black/[0.05]"
-                />
-                <img
-                  src={aboutExtraImage.src}
-                  alt={aboutExtraImage.alt}
-                  loading="lazy"
-                  className="aspect-[4/5] w-full rounded-3xl object-cover shadow-soft ring-1 ring-black/[0.05]"
-                />
-              </div>
+              <img
+                src={aboutImage.src}
+                alt={aboutImage.alt}
+                loading="lazy"
+                className="w-full rounded-3xl object-cover shadow-soft ring-1 ring-black/[0.05]"
+              />
               <div className="absolute -bottom-6 -right-4 rounded-2xl bg-white px-6 py-4 shadow-soft sm:-right-6">
                 <p className="text-2xl font-black text-brand-gradient">Since {brand.since}</p>
                 <p className="text-xs font-medium text-gray-500">Based in Slough, UK</p>

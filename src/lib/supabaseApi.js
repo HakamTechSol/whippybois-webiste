@@ -6,8 +6,8 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
  * Public write-only insert into the `quote_requests` table.
  *
  * @param {object} payload - row matching the `quote_requests` columns
- *   (full_name, email, phone, event_type, event_date, guest_count,
- *    location, budget_range, message)
+ *   (full_name, email, phone, event_type, event_date, event_time, duration,
+ *    guest_count, location, budget_range, message)
  * @returns {Promise<object[]>} the inserted row(s)
  */
 export async function submitQuoteRequest(payload) {
