@@ -428,7 +428,7 @@ export const footerLinks = {
 }
 
 export const contactInfo = {
-  email: 'hello@whippybois.co.uk',
-  phone: '+44 7800 123456',
+  email: 'whippybois@gmail.com',
+  phone: '07748 878588',
   address: 'Based in Slough, UK · Serving Berkshire, Oxfordshire & beyond',
 }
