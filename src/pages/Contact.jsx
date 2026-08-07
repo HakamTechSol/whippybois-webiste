@@ -1,8 +1,23 @@
 import { useState, useEffect } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Mail, Phone, MapPin, Send, CheckCircle2, X, Clock, Loader2, AlertCircle } from 'lucide-react'
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Send,
+  CheckCircle2,
+  X,
+  Clock,
+  Loader2,
+  AlertCircle,
+  Eye,
+  EyeOff,
+  UserPlus,
+  Sparkles,
+} from 'lucide-react'
 import { contactInfo } from '../data/content'
-import { submitQuoteRequest } from '../lib/supabaseApi'
+import { checkEmailExists, createCustomerAccount, submitQuoteRequest } from '../lib/supabaseApi'
 import FadeIn from '../components/FadeIn'
 import FloatingIcecream from '../components/FloatingIcecream'
 
@@ -113,6 +128,22 @@ export default function Contact() {
   const [loading, setLoading] = useState(false)
   const [celebrate, setCelebrate] = useState(false)
 
+  // Account-creation modal (shown when the email has no account yet).
+  const [accountModalOpen, setAccountModalOpen] = useState(false)
+  const [accountPassword, setAccountPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [creatingAccount, setCreatingAccount] = useState(false)
+  const [accountError, setAccountError] = useState('')
+  const [pendingPayload, setPendingPayload] = useState(null)
+
+  // Verification-email modal shown right after a successful registration.
+  const [verificationOpen, setVerificationOpen] = useState(false)
+
+  const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const accountCreated = searchParams.get('account') === 'created'
+  const createdEmail = accountCreated ? sessionStorage.getItem('wb_created_email') || '' : ''
+
   // Auto-dismiss the toast after a few seconds.
   useEffect(() => {
     if (!toast) return
@@ -160,37 +191,42 @@ export default function Contact() {
     setErrors(next)
     if (Object.keys(next).length > 0) return
 
+    const payload = buildPayload()
+    const email = form.email.trim()
+
     setLoading(true)
     try {
-      const budget = budgetToRange[form.budget_range] ?? { budget_min: 0, budget_max: null }
-      const payload = {
-        customer_name: form.full_name.trim(),
-        email: form.email.trim(),
-        phone: form.phone.trim() || null,
-        event_type: form.event_type,
-        event_date: form.event_date,
-        event_time: form.event_time,
-        duration_minutes: durationToMinutes[form.duration] ?? null,
-        guest_count: form.guest_count ? Number(form.guest_count) : null,
-        location: form.location.trim(),
-        budget_min: budget.budget_min,
-        budget_max: budget.budget_max,
-        currency: 'GBP',
-        message: form.message.trim() || null,
+      // If the email already has an account (or we can't check — fall back to
+      // submitting), just send the request. Otherwise ask them to create an
+      // account first via the modal.
+      let exists = true
+      try {
+        exists = await checkEmailExists(email)
+      } catch {
+        exists = true
       }
-      await submitQuoteRequest(payload)
-      setCelebrate(true)
-      window.setTimeout(() => setCelebrate(false), 1800)
-      window.setTimeout(
-        () =>
-          setToast({
-            type: 'success',
-            title: 'Quote request sent!',
-            body: 'We’ll be in touch within one business day.',
-          }),
-        350,
-      )
-      setForm(emptyForm)
+
+      if (exists) {
+        await submitQuoteRequest(payload)
+        setCelebrate(true)
+        window.setTimeout(() => setCelebrate(false), 1800)
+        window.setTimeout(
+          () =>
+            setToast({
+              type: 'success',
+              title: 'Quote request sent!',
+              body: 'We’ll be in touch within one business day.',
+            }),
+          350,
+        )
+        setForm(emptyForm)
+      } else {
+        setPendingPayload(payload)
+        setAccountPassword('')
+        setAccountError('')
+        setShowPassword(false)
+        setAccountModalOpen(true)
+      }
     } catch (err) {
       // Keep the form data intact on failure so the user can retry.
       setToast({
@@ -201,6 +237,106 @@ export default function Contact() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const buildPayload = () => {
+    const budget = budgetToRange[form.budget_range] ?? { budget_min: 0, budget_max: null }
+    return {
+      customer_name: form.full_name.trim(),
+      email: form.email.trim(),
+      phone: form.phone.trim() || null,
+      event_type: form.event_type,
+      event_date: form.event_date,
+      event_time: form.event_time,
+      duration_minutes: durationToMinutes[form.duration] ?? null,
+      guest_count: form.guest_count ? Number(form.guest_count) : null,
+      location: form.location.trim(),
+      budget_min: budget.budget_min,
+      budget_max: budget.budget_max,
+      currency: 'GBP',
+      message: form.message.trim() || null,
+    }
+  }
+
+  // Called from the account-creation modal: create the account, then send the
+  // pending quote request, then drop them back on /contact with a banner.
+  const handleCreateAccount = async (e) => {
+    e.preventDefault()
+    setAccountError('')
+    if (!accountPassword || accountPassword.length < 8) {
+      setAccountError('Please choose a password of at least 8 characters.')
+      return
+    }
+
+    const email = form.email.trim()
+    setCreatingAccount(true)
+    let accountCreated = false
+    try {
+      try {
+        await createCustomerAccount({
+          email,
+          password: accountPassword,
+          full_name: form.full_name.trim(),
+        })
+        accountCreated = true
+      } catch (err) {
+        // Race: an account may have been created between the check and now.
+        if (!/already/i.test(err?.message || '')) throw err
+        accountCreated = true
+      }
+
+      try {
+        await submitQuoteRequest(pendingPayload)
+      } catch (err) {
+        if (accountCreated) {
+          // Account is fine — only the quote failed. Close the modal and let
+          // them retry the quote (the account check will now skip the modal).
+          setAccountModalOpen(false)
+          setAccountPassword('')
+          setToast({
+            type: 'error',
+            title: 'Account created, quote not sent',
+            body: 'Your account was created, but the quote could not be sent. Please press “Submit quote request” again.',
+          })
+          return
+        }
+        throw err
+      }
+
+      sessionStorage.setItem('wb_created_email', email)
+      setAccountModalOpen(false)
+      setAccountPassword('')
+      setPendingPayload(null)
+      setForm(emptyForm)
+      setVerificationOpen(true)
+    } catch (err) {
+      if (/already/i.test(err?.message || '')) {
+        setAccountError('An account already exists for this email.')
+      } else {
+        setAccountError(err?.message || 'We couldn’t create your account. Please try again.')
+      }
+    } finally {
+      setCreatingAccount(false)
+    }
+  }
+
+  const closeAccountModal = () => {
+    if (creatingAccount) return
+    setAccountModalOpen(false)
+    setAccountPassword('')
+    setAccountError('')
+    setPendingPayload(null)
+  }
+
+  const dismissAccountBanner = () => {
+    sessionStorage.removeItem('wb_created_email')
+    setSearchParams({}, { replace: true })
+  }
+
+  const dismissVerificationModal = () => {
+    setVerificationOpen(false)
+    // Keep the persistent banner as a reminder that the account is pending.
+    navigate('/contact?account=created', { replace: true })
   }
 
   const dismissToast = () => setToast(null)
@@ -272,6 +408,34 @@ export default function Contact() {
         <div className="relative mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[1.5fr_1fr] lg:gap-12 lg:px-8">
           {/* ===== Form ===== */}
           <FadeIn>
+            {accountCreated && (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-6 flex items-start gap-3 rounded-2xl border border-green-200 bg-green-50 p-4"
+              >
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-500/15 text-green-700">
+                  <Sparkles size={20} />
+                </span>
+                <div className="flex-1">
+                  <p className="text-sm font-bold text-green-900">Account created — thank you!</p>
+                  <p className="mt-0.5 text-xs leading-relaxed text-green-800">
+                    Your quote request has been submitted and your details are saved. We’ve sent a
+                    confirmation email to <span className="font-semibold">{createdEmail}</span> — please
+                    click the link in it to confirm your account.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={dismissAccountBanner}
+                  aria-label="Dismiss"
+                  className="rounded-lg p-1.5 text-green-500 transition-colors hover:bg-green-100 hover:text-green-700"
+                >
+                  <X size={16} />
+                </button>
+              </motion.div>
+            )}
+
             <form
               onSubmit={handleSubmit}
               noValidate
@@ -599,6 +763,155 @@ export default function Contact() {
 
       {/* Celebrate burst on success */}
       {celebrate && <SprinkleBurst />}
+
+      {/* Account creation modal */}
+      <AnimatePresence>
+        {accountModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[65] flex items-center justify-center bg-black/50 px-4 backdrop-blur-sm"
+            onClick={closeAccountModal}
+          >
+            <motion.form
+              onSubmit={handleCreateAccount}
+              initial={{ opacity: 0, y: 24, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 16, scale: 0.97 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-md rounded-3xl border border-gray-100 bg-white p-6 shadow-soft sm:p-8"
+            >
+              <div className="flex items-start justify-between">
+                <div className="bg-brand-gradient flex h-12 w-12 items-center justify-center rounded-2xl text-white shadow-card">
+                  <UserPlus size={22} />
+                </div>
+                <button
+                  type="button"
+                  onClick={closeAccountModal}
+                  aria-label="Close"
+                  className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <h3 className="mt-4 text-xl font-bold text-gray-900">Create your account</h3>
+              <p className="mt-1 text-sm leading-relaxed text-gray-500">
+                We couldn’t find an account for this email, so we’ll create one to save your details
+                for future quotes.
+              </p>
+
+              <div className="mt-5 space-y-4">
+                <div>
+                  <label className="mb-1.5 block text-sm font-semibold text-gray-800">Email</label>
+                  <input
+                    type="email"
+                    value={form.email}
+                    readOnly
+                    tabIndex={-1}
+                    className="w-full cursor-not-allowed rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600 outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-1.5 block text-sm font-semibold text-gray-800">
+                    Create a password <span className="text-brand-600">*</span>
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      value={accountPassword}
+                      onChange={(e) => {
+                        setAccountPassword(e.target.value)
+                        if (accountError) setAccountError('')
+                      }}
+                      placeholder="At least 8 characters"
+                      autoComplete="new-password"
+                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 pr-12 text-sm text-gray-900 outline-none transition-all focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((v) => !v)}
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-gray-400 transition-colors hover:text-gray-600"
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                  {accountError && (
+                    <p className="mt-1.5 text-xs font-medium text-red-600">{accountError}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row">
+                <button
+                  type="button"
+                  onClick={closeAccountModal}
+                  disabled={creatingAccount}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-6 py-3 text-sm font-bold text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={creatingAccount}
+                  className="bg-brand-gradient inline-flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-bold text-white shadow-card transition-all hover:-translate-y-0.5 hover:shadow-soft disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0 sm:w-auto"
+                >
+                  {creatingAccount ? (
+                    <Loader2 size={16} className="animate-spin" />
+                  ) : (
+                    <UserPlus size={16} />
+                  )}
+                  {creatingAccount ? 'Creating account…' : 'Create account & send request'}
+                </button>
+              </div>
+            </motion.form>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Verification-email modal (right after account registration) */}
+      <AnimatePresence>
+        {verificationOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[65] flex items-center justify-center bg-black/50 px-4 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 24, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 16, scale: 0.97 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+              className="w-full max-w-md rounded-3xl border border-gray-100 bg-white p-6 text-center shadow-soft sm:p-8"
+            >
+              <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-green-600">
+                <Mail size={30} />
+              </span>
+              <h3 className="mt-4 text-xl font-bold text-gray-900">Check your inbox</h3>
+              <p className="mt-2 text-sm leading-relaxed text-gray-600">
+                An account verification email has been sent to{' '}
+                <span className="font-semibold text-gray-900">
+                  {sessionStorage.getItem('wb_created_email') || form.email}
+                </span>
+                . Please check your inbox (and spam folder) and click the link to
+                confirm your account.
+              </p>
+              <button
+                type="button"
+                onClick={dismissVerificationModal}
+                className="bg-brand-gradient mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-bold text-white shadow-card transition-all hover:-translate-y-0.5 hover:shadow-soft"
+              >
+                Got it
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   )
 }
