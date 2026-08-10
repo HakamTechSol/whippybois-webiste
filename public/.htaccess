@@ -1,0 +1,16 @@
+# -----------------------------------------------------------------------------
+# Required GitHub Secrets (Settings → Secrets and variables → Actions):
+#   FTP_HOST, FTP_USERNAME, FTP_PASSWORD, VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY
+# -----------------------------------------------------------------------------
+
+# SPA fallback: let React Router handle client-side routes.
+# Any request that is not an existing file or directory is served index.html,
+# so direct loads/refreshes of routes like /about or /contact do not 404.
+RewriteEngine On
+RewriteBase /
+
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+RewriteRule ^ index.html [L]
