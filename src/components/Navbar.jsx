@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
 import { brand, navLinks } from '../data/content'
 
+const DASHBOARD_URL = 'https://dashboard.whippybois.co.uk'
+
 function scrollToSection(id) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
@@ -11,7 +13,7 @@ function scrollToSection(id) {
 /**
  * Sticky top navbar.
  * - Transparent at top of the page, gains a soft shadow + blur once scrolled.
- * - Logo left, links right, "Get a Quote" CTA (collapses to a mobile menu).
+ * - Logo left, links right, action CTAs (collapses to a mobile menu).
  * - Links either scroll to an on-page section or route to a page.
  */
 export default function Navbar() {
@@ -84,6 +86,12 @@ export default function Navbar() {
 
         {/* Action buttons */}
         <div className="hidden items-center gap-3 md:flex">
+          <a
+            href={DASHBOARD_URL}
+            className="inline-flex items-center gap-1.5 rounded-full border border-brand-200 bg-white px-5 py-2.5 text-sm font-semibold text-brand-700 shadow-sm transition-all hover:-translate-y-0.5 hover:border-brand-300 hover:bg-brand-50 hover:shadow-card"
+          >
+            Customer Signin
+          </a>
           <Link
             to="/contact"
             className="bg-brand-gradient group inline-flex items-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-semibold text-white shadow-card transition-all hover:-translate-y-0.5 hover:shadow-soft"
@@ -135,6 +143,13 @@ export default function Navbar() {
                 )
               )}
               <div className="pt-3">
+                <a
+                  href={DASHBOARD_URL}
+                  onClick={() => setOpen(false)}
+                  className="mb-2 flex items-center justify-center rounded-full border border-brand-200 bg-white px-4 py-2.5 text-center text-sm font-semibold text-brand-700"
+                >
+                  Customer Signin
+                </a>
                 <Link
                   to="/contact"
                   className="bg-brand-gradient group flex items-center justify-center gap-1.5 rounded-full px-4 py-2.5 text-center text-sm font-semibold text-white"
