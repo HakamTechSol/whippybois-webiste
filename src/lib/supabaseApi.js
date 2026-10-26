@@ -74,8 +74,7 @@ export async function checkEmailExists(email) {
  * @param {object} params { email, password, full_name }
  * @returns {Promise<object>} the created user / session payload
  */
-export async function createCustomerAccount({ email, password, full_name }) {
-  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+export async function createCustomerAccount({ email, password, full_name }) {  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
     throw new Error('Supabase is not configured.')
   }
 
@@ -94,6 +93,42 @@ export async function createCustomerAccount({ email, password, full_name }) {
     throw new Error(
       errorData?.msg || errorData?.error_description || errorData?.message || 'Could not create an account',
     )
+  }
+
+  return res.json()
+}
+
+/**
+ * Record a customer's Accept / Reject decision on the public /quote-response page.
+ * Calls the SECURITY DEFINER RPC `respond_to_quote` (anon-safe). The function
+ * validates the token (reference_id) and only applies when status is 'quote_sent'.
+ *
+ * @param {object} params { quote_id, token, action, rejection_reason? }
+ * @returns {Promise<object>} { ok, action, reference_id, error? }
+ */
+export async function respondToQuote({ quote_id, token, action, rejection_reason }) {
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    throw new Error('Supabase is not configured.')
+  }
+
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/respond_to_quote`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+    },
+    body: JSON.stringify({
+      p_quote_id: quote_id,
+      p_token: token,
+      p_action: action,
+      p_rejection_reason: rejection_reason ?? null,
+    }),
+  })
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => null)
+    throw new Error(errorData?.message || 'Something went wrong. Please try again.')
   }
 
   return res.json()
